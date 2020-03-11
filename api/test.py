@@ -20,6 +20,7 @@ model_imagenet = MobileNetV2(weights='imagenet')
 
 
 def process_video(vf):
+    video_dict_list = []
     try:
         container = av.open(vf)
         stream = container.streams.video[0]
@@ -44,7 +45,7 @@ def process_video(vf):
             #     print(e)
         
         preds_list = model_imagenet.predict(np.vstack(frames_list),batch_size=256)
-        video_dict_list = []
+        
         P = imagenet_utils.decode_predictions(preds_list)
 
         for pred,time in zip(P,frame_times):
