@@ -26,7 +26,7 @@ def process_video(vf):
         stream.codec_context.skip_frame = 'NONKEY'
         folder,filename = os.path.split(vf)
         #fn = filename.replace(".mp4","").strip()
-        frames_list = [];frame_times = []
+        frames_list = [], frame_times = []
         ts_list = []
         for frame in container.decode(stream):
             try:
@@ -57,19 +57,19 @@ def process_video(vf):
     return video_dict_list
 
 
-def main():
+# def main():
 
-    test_url_list = ["http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
-                    "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
-                    "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-                    "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"]
-    total_play = 0
-    total_process = 0
-    #shuffle(url_list)
-    for url in test_url_list:
-        vid_dict = process_video(url)
-        print("[+] send callback to callback url: ", vid_dict)
+#     test_url_list = ["http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+#                     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+#                     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+#                     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"]
+#     total_play = 0
+#     total_process = 0
+#     #shuffle(url_list)
+#     for url in test_url_list:
+#         vid_dict = process_video(url)
+#         print("[+] send callback to callback url: ", vid_dict)
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()

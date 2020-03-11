@@ -20,5 +20,5 @@ from api.imagenet import process
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/process', process, name="process_video")
+    path('videos/process', process, name="process_video")
 ]
