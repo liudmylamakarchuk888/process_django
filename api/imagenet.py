@@ -13,7 +13,7 @@ def process(request):
         vid_dict = process_video(video_url)
     except:
         return JsonResponse({'status': '0', 'result':"Process Video error"}, status=500)
-    
+    print(vid_dict)    
     try:
         r = requests.get(callback_url, params={"result" : json.dumps(vid_dict)})
         print(r.url)
