@@ -34,7 +34,7 @@ def process_video(vf):
             frame_img = frame.to_image()
             frame_pil = frame_img.resize((224,224), Image.ANTIALIAS)
             frame_time = frame.pts * stream.time_base
-            frame_times.append(frame_time)
+            frame_times.append(float(frame_time))
             x = image.img_to_array(frame_pil)
             x = np.expand_dims(x, axis=0)
             x = preprocess_input(x)
