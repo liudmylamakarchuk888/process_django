@@ -20,41 +20,42 @@ model_imagenet = MobileNetV2(weights='imagenet')
 
 
 def process_video(vf):
-    # try:
-    container = av.open(vf)
-    stream = container.streams.video[0]
-    stream.codec_context.skip_frame = 'NONKEY'
-    folder,filename = os.path.split(vf)
-    #fn = filename.replace(".mp4","").strip()
-    frames_list = [];frame_times = []
-    ts_list = []
-    for frame in container.decode(stream):
-        # try:
-        frame_img = frame.to_image()
-        frame_pil = frame_img.resize((224,224), Image.ANTIALIAS)
-        frame_time = frame.pts * stream.time_base
-        frame_times.append(frame_time)
-        x = image.img_to_array(frame_pil)
-        x = np.expand_dims(x, axis=0)
-        x = preprocess_input(x)
-        frames_list.append(x)
-            #temp = datetime.datetime.fromtimestamp(ts / 1000).strftime('%H:%M:%S')
-            #ts_list.append(temp)
-        # except Exception as e:
-        #     print(e)
-    
-    preds_list = model_imagenet.predict(np.vstack(frames_list),batch_size=256)
-    video_dict_list = []
-    P = imagenet_utils.decode_predictions(preds_list)
+    try:
+        container = av.open(vf)
+        stream = container.streams.video[0]
+        stream.codec_context.skip_frame = 'NONKEY'
+        folder,filename = os.path.split(vf)
+        #fn = filename.replace(".mp4","").strip()
+        frames_list = [];frame_times = []
+        ts_list = []
+        for frame in container.decode(stream):
+            # try:
+            frame_img = frame.to_image()
+            frame_pil = frame_img.resize((224,224), Image.ANTIALIAS)
+            frame_time = frame.pts * stream.time_base
+            frame_times.append(frame_time)
+            x = image.img_to_array(frame_pil)
+            x = np.expand_dims(x, axis=0)
+            x = preprocess_input(x)
+            frames_list.append(x)
+                #temp = datetime.datetime.fromtimestamp(ts / 1000).strftime('%H:%M:%S')
+                #ts_list.append(temp)
+            # except Exception as e:
+            #     print(e)
+        
+        preds_list = model_imagenet.predict(np.vstack(frames_list),batch_size=256)
+        video_dict_list = []
+        P = imagenet_utils.decode_predictions(preds_list)
 
-    for pred,time in zip(P,frame_times):
-        final_dict= {}
-        final_dict["video_url"] = vf
-        final_dict[time] = pred
-        video_dict_list.append(final_dict)
+        for pred,time in zip(P,frame_times):
+            final_dict= {}
+            final_dict["video_url"] = vf
+            final_dict[time] = pred
+            video_dict_list.append(final_dict)
+    
+    except Exception as e:
+        print(e)
     return video_dict_list
-    # except Exception as e:
-    #     print(e)
     
 
 
