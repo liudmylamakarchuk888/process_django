@@ -21,13 +21,14 @@ from sklearn.utils.extmath import softmax
 from random import shuffle
 import time
 
-model_imagenet = MobileNetV2(weights='imagenet')
 
-map_dict = {}
-with open("./mapping.csv","r") as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        map_dict[row["Tier-4"]] = row
+def get_mapdict():
+    map_dict = {}
+    with open("./mapping.csv","r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            map_dict[row["Tier-4"]] = row
+    return map_dict
 
 def get_hhmmss(seconds): 
     min, sec = divmod(seconds, 60) 
@@ -94,6 +95,9 @@ def get_video_summary(items_list):
     return summary_dict
 
 def process_stream(video_url):
+    model_imagenet = MobileNetV2(weights='imagenet')
+    map_dict = get_mapdict()
+    final_dict = {}
     try:
         folder,filename = os.path.split(video_url)
         filename_without_ext = filename.split(".")[0]
@@ -161,7 +165,6 @@ def process_stream(video_url):
                 print(e)
 
         summary_dict = get_video_summary(frames_json_list)
-        final_dict = {}
         final_dict["url"] = video_url
         final_dict["summary"] = summary_dict
         final_dict["scenes"] = frames_json_list
@@ -172,17 +175,17 @@ def process_stream(video_url):
 
 
 
-def main():
+# def main():
 
-    test_url_list = ["http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
-                    "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
-                    "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-                    "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"]
+#     test_url_list = ["http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+#                     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+#                     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+#                     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"]
 
 
-    for url in test_url_list:
-        final_dict = process_stream(url)
-        print("[+] send callback to callback url: ", final_dict)
+#     for url in test_url_list:
+#         final_dict = process_stream(url)
+#         print("[+] send callback to callback url: ", final_dict)
 
 
 if __name__ == '__main__':

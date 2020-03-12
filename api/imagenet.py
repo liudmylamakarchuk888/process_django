@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 import requests
 import json
-from api.process_video_streams_imagenet_only import process_video
+from api.process_videos import process_stream
 
 
 def process(request):
@@ -10,12 +10,12 @@ def process(request):
     
     vid_dict = []
     try:
-        vid_dict = process_video(video_url)
+        vid_dict = process_stream(video_url)
     except:
         return JsonResponse({'status': '0', 'result':"Process Video error"}, status=500)
     print(vid_dict)    
     try:
-        r = requests.get(callback_url, params={"result" : json.dumps(vid_dict)})
+        r = requests.get(callback_url, params=vid_dict)
         print(r.url)
     except:
         return JsonResponse({'status': '0', 'result': "ConnectionError"}, status=500)
