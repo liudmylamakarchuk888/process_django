@@ -20,11 +20,13 @@ from collections import deque
 from sklearn.utils.extmath import softmax
 from random import shuffle
 import time
+from settings import CSV_FOLDER
 
 
 def get_mapdict():
     map_dict = {}
-    with open("./mapping.csv","r") as f:
+    csv_path = os.path.join(CSV_FOLDER, 'mapping.csv')
+    with open(csv_path,"r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             map_dict[row["Tier-4"]] = row
