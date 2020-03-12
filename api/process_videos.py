@@ -29,6 +29,11 @@ with open("./mapping.csv","r") as f:
     for row in reader:
         map_dict[row["Tier-4"]] = row
 
+def get_hhmmss(seconds): 
+    min, sec = divmod(seconds, 60) 
+    hour, min = divmod(min, 60) 
+    return "%02d:%02d:%02d" % (hour, min, sec) 
+
 def get_dict(sorted_tuples,count):
     _dict = {}
     for tuple in sorted_tuples:
@@ -139,7 +144,7 @@ def process_stream(video_url):
 
 
                     score = int(prob * 100)
-                    tag_dict["timestamp"] = int(frame_time)
+                    tag_dict["timestamp"] = get_hhmmss(int(frame_time))
                     tag_dict["category"] = cat
                     tag_dict["subcategory"] = subcat
                     tag_dict["object"] = tag
@@ -156,10 +161,14 @@ def process_stream(video_url):
                 print(e)
 
         summary_dict = get_video_summary(frames_json_list)
+        final_dict = {}
+        final_dict["url"] = video_url
+        final_dict["summary"] = summary_dict
+        final_dict["scenes"] = frames_json_list
 
     except Exception as e:
         print(e)
-    return summary_dict
+    return final_dict
 
 
 
@@ -172,5 +181,9 @@ def main():
 
 
     for url in test_url_list:
-        summary_dict = process_stream(url)
-        print("[+] send callback to callback url: ", summary_dict)
+        final_dict = process_stream(url)
+        print("[+] send callback to callback url: ", final_dict)
+
+
+if __name__ == '__main__':
+    main()
