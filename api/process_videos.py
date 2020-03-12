@@ -20,7 +20,7 @@ from collections import deque
 from sklearn.utils.extmath import softmax
 from random import shuffle
 import time
-import django.conf import settings
+from django.conf import settings
 
 
 def get_mapdict():
@@ -149,6 +149,8 @@ def process_stream(video_url):
                 tag_dict = {}
                 for (i, (imagenetID, label, prob)) in enumerate(P[0]):
                     if prob <= 0.1:
+                        break
+                    if label not in map_dict:
                         break
                     cat = map_dict[label]["Tier-1"]
                     subcat = map_dict[label]["Tier-2"]
