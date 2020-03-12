@@ -98,79 +98,79 @@ def process_stream(video_url):
     model_imagenet = MobileNetV2(weights='imagenet')
     map_dict = get_mapdict()
     final_dict = {}
-    try:
-        folder,filename = os.path.split(video_url)
-        filename_without_ext = filename.split(".")[0]
-        start = time.time()
+    # try:
+    folder,filename = os.path.split(video_url)
+    filename_without_ext = filename.split(".")[0]
+    start = time.time()
 
-        container = av.open(video_url)
-        stream = container.streams.video[0]
-        tgt_folder = os.path.join("frames",filename_without_ext)
-        if not os.path.isdir(tgt_folder): os.makedirs(tgt_folder)
-        v_start = None;v_end = None
-        #we only look at key-frames
-        stream.codec_context.skip_frame = 'NONKEY'
-        frames_json_list = []
-        duration = None
+    container = av.open(video_url)
+    stream = container.streams.video[0]
+    tgt_folder = os.path.join("frames",filename_without_ext)
+    if not os.path.isdir(tgt_folder): os.makedirs(tgt_folder)
+    v_start = None;v_end = None
+    #we only look at key-frames
+    stream.codec_context.skip_frame = 'NONKEY'
+    frames_json_list = []
+    duration = None
 
-        for n,frame in enumerate(container.decode(stream)):
-            try:
-                frame_time = frame.pts * stream.time_base
-                if v_start is None: v_start = frame_time
-                v_end = frame_time
-                img_pil = frame.to_image()
-                #img_pil.thumbnail((480,480))
-                #img_cv = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
-                frame_pil = img_pil.resize((224,224), Image.ANTIALIAS)
-                x = image.img_to_array(frame_pil)
-                x = np.expand_dims(x, axis=0)
-                x = preprocess_input(x)
+    for n,frame in enumerate(container.decode(stream)):
+        # try:
+        frame_time = frame.pts * stream.time_base
+        if v_start is None: v_start = frame_time
+        v_end = frame_time
+        img_pil = frame.to_image()
+        #img_pil.thumbnail((480,480))
+        #img_cv = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+        frame_pil = img_pil.resize((224,224), Image.ANTIALIAS)
+        x = image.img_to_array(frame_pil)
+        x = np.expand_dims(x, axis=0)
+        x = preprocess_input(x)
 
-                in_preds = model_imagenet.predict(x)
+        in_preds = model_imagenet.predict(x)
 
-                P = imagenet_utils.decode_predictions(in_preds)
-                tag_dict = {}
-                for (i, (imagenetID, label, prob)) in enumerate(P[0]):
-                    if prob <= 0.1: break
-                    cat = map_dict[label]["Tier-1"]
-                    subcat = map_dict[label]["Tier-2"]
-                    tag = map_dict[label]["Tier-3"]
-                    activity = map_dict[label]["activity"]
-                    place = map_dict[label]["place"]
-                    actor = map_dict[label]["actor"]
-                    if actor != "":
-                        display = "{} {} {}".format(actor,activity,tag)
-                    else:
-                        if place == "":
-                            display = "{} {} {}".format(tag,activity,actor)
-                        else:
-                            display = "{} {} {}".format(tag,activity,place)
+        P = imagenet_utils.decode_predictions(in_preds)
+        tag_dict = {}
+        for (i, (imagenetID, label, prob)) in enumerate(P[0]):
+            if prob <= 0.1: break
+            cat = map_dict[label]["Tier-1"]
+            subcat = map_dict[label]["Tier-2"]
+            tag = map_dict[label]["Tier-3"]
+            activity = map_dict[label]["activity"]
+            place = map_dict[label]["place"]
+            actor = map_dict[label]["actor"]
+            if actor != "":
+                display = "{} {} {}".format(actor,activity,tag)
+            else:
+                if place == "":
+                    display = "{} {} {}".format(tag,activity,actor)
+                else:
+                    display = "{} {} {}".format(tag,activity,place)
 
 
-                    score = int(prob * 100)
-                    tag_dict["timestamp"] = get_hhmmss(int(frame_time))
-                    tag_dict["category"] = cat
-                    tag_dict["subcategory"] = subcat
-                    tag_dict["object"] = tag
-                    tag_dict["score"] = score
-                    tag_dict["place"] = place
-                    tag_dict["activity"] = activity
-                    tag_dict["subject"] = actor
+            score = int(prob * 100)
+            tag_dict["timestamp"] = get_hhmmss(int(frame_time))
+            tag_dict["category"] = cat
+            tag_dict["subcategory"] = subcat
+            tag_dict["object"] = tag
+            tag_dict["score"] = score
+            tag_dict["place"] = place
+            tag_dict["activity"] = activity
+            tag_dict["subject"] = actor
 
-                    frames_json_list.append(tag_dict)
+            frames_json_list.append(tag_dict)
 
-                    break
+            break
 
-            except Exception as e:
-                print(e)
+        # except Exception as e:
+        #     print(e)
 
-        summary_dict = get_video_summary(frames_json_list)
-        final_dict["url"] = video_url
-        final_dict["summary"] = summary_dict
-        final_dict["scenes"] = frames_json_list
+    summary_dict = get_video_summary(frames_json_list)
+    final_dict["url"] = video_url
+    final_dict["summary"] = summary_dict
+    final_dict["scenes"] = frames_json_list
 
-    except Exception as e:
-        print(e)
+    # except Exception as e:
+    #     print(e)
     return final_dict
 
 
