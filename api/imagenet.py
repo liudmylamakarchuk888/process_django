@@ -9,13 +9,12 @@ def process(request):
     callback_url = request.GET.get('callback_url')
     
     vid_dict = []
-    # try:
-    vid_dict = process_stream(video_url)
-    # except:
-    #     return JsonResponse({'status': '0', 'result':"Process Video error"}, status=500)
-    print(vid_dict)    
     try:
-        r = requests.get(callback_url, params=vid_dict)
+        vid_dict = process_stream(video_url)
+    except:
+        return JsonResponse({'status': '0', 'result':"Process Video error"}, status=500)
+    try:
+        r = requests.post(callback_url, data=vid_dict)
         print(r.url)
     except:
         return JsonResponse({'status': '0', 'result': "ConnectionError"}, status=500)
