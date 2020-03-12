@@ -14,7 +14,7 @@ def process(request):
     except:
         return JsonResponse({'status': '0', 'result':"Process Video error"}, status=500)
     try:
-        r = requests.post(callback_url, data=vid_dict)
+        r = requests.post(callback_url, data=(json.dumps(vid_dict)))
         print(r.url)
     except:
         return JsonResponse({'status': '0', 'result': "ConnectionError"}, status=500)
